@@ -106,7 +106,7 @@ class TTAFrame():
         else:
             raise IndexError("The image is too small")
 
-
+        img = img[:size,:size]
         img90 = np.array(np.rot90(img))
         img1 = np.concatenate([img[None],img90[None]])
         img2 = np.array(img1)[:,::-1]
@@ -155,16 +155,16 @@ val = os.listdir(source)
 solver = TTAFrame(DinkNet34)
 solver.load('weights/log01_dink34.th')
 tic = time()
-target = 'submits/log01_dink34/'
+target = 'submits/dlinknet/'
 os.mkdir(target)
 for i,name in enumerate(val):
     if i%10 == 0:
         print i/10, '    ','%.2f'%(time()-tic)
-    fname = source + path
-    if fname[-4:] != "tiff":
+    fname = source + name
+    if fname[-3:] != "tif":
         continue
-    mask = solver.test_one_img_from_path(source+name)
+    mask = solver.test_one_img_from_path(fname)
     mask[mask>4.0] = 255
     mask[mask<=4.0] = 0
     mask = np.concatenate([mask[:,:,None],mask[:,:,None],mask[:,:,None]],axis=2)
-    cv2.imwrite(target+name[:-7]+'mask.png',mask.astype(np.uint8))
+    cv2.imwrite(target+name[:-4]+'mask.png',mask.astype(np.uint8))
